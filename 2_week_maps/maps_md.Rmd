@@ -1,0 +1,126 @@
+---
+title: "suicidiolatam_graph"
+author: "dacb"
+date: "2023-02-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intentaremos generar gráficos
+
+A partir de la limpieza ya realizada en el cuaderno anterior de suicidio donde utilizamos la librería Pandas en Python. Para este proceso usaremos los paquetes de R de tidyverse, sf y ggplot2
+
+```{r}
+install.packages("sf")
+```
+```{r}
+library(sf)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+```
+
+Importamos las tablas que generamos al final del trabajo anterior.
+
+```{r}
+latam <- read.csv("materiales/latam_suicidio.csv")
+
+peru <- read.csv("materiales/peru_suicidio.csv")
+```
+
+Ahora, con los paquetes cargados y las tablas importadas a R, trabajamos el shapefile (archivo de datos geograficos), en este caso probaremos incluir un shapefile en JSON con el paquete sf, bajo el comando st_read
+
+```{r}
+latam_map <- st_read("materiales/custom.json")
+```
+
+## Usando la libreria SF
+
+En nuestros primeros pasos, con el archivo importado, buscamos crear una grafica en base a los valores del shapefile. Agradezco al tutorial de [Patricio Estevez](https://www.prestevez.com/es/post/tutorial-mapas-tidyverse/) del cuál nos robamos/inspiramos para el código
+
+```{r}
+latam_map %>%
+  ggplot() + # Crea un objeto ggplot a partir del objeto
+  geom_sf() # agrega una capa con el mapa```
+```
+
+Funciona! Ahora que sabemos que podemos incluir un shapefile sin el engorroso proceso de pasar por una interfaz de GIS (Arc, Geo u otros) podemos buscar en internet por otros archivos que se adequen mas a nuestras necesidades específicas. Por mientras, continuemos trabajando con este shapefile para experimentar.
+
+- En mi conocimiento, el estado peruano no cuenta con un repositorio de shapefiles de libre acceso, si existen mapas online pero la descarga de datos no esta generalizada. En GIS el proceso que se realiza para extrapolar datos virtuales pasa por tomar screenshots a la pantalla del navegador y relacionarlos con las coordenadas geográficas. En teoría, podríamos realizar un scraper que automatice el calculo para convertir el archivo directamente a shapefile y nuevamente saltearnos los programas geográficos, que suelen ser bastante exigentes para las computadoras de menor memoria gráfica. Pregunta al aire ¿El Ministerio del Ambiente o Defensa tendrán shapefiles a la venta del Perú? -
+
+```{r}
+grouped_geo <- latam_map %>%
+  group_by(sovereignt)
+head(grouped_geo)
+```
+
+Queremos contar cuantos casos tenemos registrados por país de latinoamérica. No sabía cómo realizar esta tarea sencilla, así que realicé un prompt en OpenAI. La primera respuesta de la IA no funcionó pero una segunda petición con mejores especificaciones dió con la respuesta rápidamente. Primero nos recomienda agrupar la data por pais
+
+```{r}
+grouped_data <- latam %>%
+  group_by(country)
+```
+
+Posteriormente, contamos la data agrupada según los "Distinct", o casos únicos, que encontramos en la tabla. Este concepto de "Distinct" es muy importante en el analisis de datos y la computacion, y la encontraremos como distinct o unique en multiples lenguajes.
+
+```{r}
+result <- grouped_data %>% 
+  summarize(number_of_years = n_distinct(year))
+head(result)
+```
+Como ultimo paso con la tabla de latinoamerica, unimos los resultados del total de años registrados en la tabla con la informacion general sobre el suicidio con la que contamos.
+
+```{r}
+# Perform a left join on the latam and result tables
+latam_with_years <- left_join(latam, result, by = "country")
+
+# Sort the latam_with_years table by number_of_years in descending order
+latam_with_years_sorted <- latam_with_years %>% 
+  arrange(number_of_years)
+
+# View the sorted latam_with_years_sorted table
+head(latam_with_years_sorted)
+
+```
+
+La siguiente parte del trabajo sera unir la tabla con la informacion geografica junto con la tabla de informacion social. Para poder realizar esto primero debemos verificar que tengamos algun dato por el cual unir. Experimentaremos con el pais.
+
+Unimos las tablas en base al país de latam_suicidio
+
+```{r}
+geo_latam <- latam_map %>%
+  left_join(latam_with_years_sorted, by = c("sovereignt" = "country"))
+```
+
+y verificamos la integridad de los datos geograficos
+
+```{r}
+geo_latam %>%
+  ggplot() + # Crea un objeto ggplot a partir del objeto
+  geom_sf() # agrega una capa con el mapa```
+```
+Con la verificacion de integridad ahora podemos añadir colores al mapa para hacerlo "coroplético". Queremos generar una vista donde se resalten los países según el número de registros que tienen por país. 
+
+```{r}
+geo_latam %>%
+  ggplot(aes(fill = number_of_years)) + # Crea un objeto ggplot a partir del objeto
+  geom_sf() # agrega una capa con el mapa
+```
+
+Lo primero que salta a la vista son los datos faltantes de algunos países latinos, por otro lado, Perú y República Dominicana son visiblemente los países con peor registro. Sin embargo, la gradiente de color no me gusta y quisiera invertirla. 
+
+```{r}
+geo_latam %>%
+  ggplot(aes(fill = number_of_years)) +
+  geom_sf() +
+  labs(title = "Número de años registrados por País",
+    subtitle = "Información actualizada al 2021",
+    caption = "https://www.kaggle.com/datasets/omkargowda/suicide-rates-overview-1985-to-2021") +
+  scale_fill_gradient("Años registrados", high = "#c0d6e4", low = "#7a67ee") +
+  theme_bw()
+```
+
+Listo. Vemos que utilizando la libreria shapefiles y ggplot2 es facil trabajar la informacion para su generar mapas. La parte más ardua del proceso continúa siendo la limpieza y combinación de datos, y la dificultad de esto aumenta cuando nuestra información es no estructurada. Un análisis más "antropológico" puede, por la necesidad de plantear mapas "unicos", dificultar que encontremos shapefiles gratis en internet con la información correcta, y deberemos encontrar soluciones si queremos saltearnos la necesidad de programas GIS.

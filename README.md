@@ -29,3 +29,10 @@ Para el siguiente proyecto utilizamos la base de datos de los ingresantes del 20
   ![Mapa interactiva base](/img/base_mapa.png)
 
   ![Resultado final](/img/mapa_final.png)  
+
+  Respecto al diseño final las regiones están agrupada en macroregiones: 
+
+  - Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad
+  - Centro: Ancash, Junín, Cerro de Pasco, Huánuco, Huancavelica, Ayacucho, Ica 
+  - Sur: Arequipa, Moquegua, Tacna, Cusco, Madre de Dios, Apurímac.
+  - Lima y Callao 

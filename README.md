@@ -10,7 +10,7 @@ Survey: ENA 2019
 
 Result:
 
-![Result](/imagenes/mapaPeru.png) 
+![Result](/output/mapaPeru.png) 
 
 
 Conclusion:

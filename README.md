@@ -1,10 +1,10 @@
-# Mapas
 
 ## Índice 
 
-* [1. Preámbulo](#1-preámbulo)
-* [2. Descripción del proyecto](#2-definición-del-producto)
-* [2. Desarrollo del proyecto](#2-desarrollo-del-proyecto)
+- [Índice](#índice)
+- [1. Preámbulo](#1-preámbulo)
+- [2. Definición del producto](#2-definición-del-producto)
+- [3. Desarrollo del proyecto](#3-desarrollo-del-proyecto)
 
 ***
 

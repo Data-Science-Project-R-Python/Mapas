@@ -1,0 +1,35 @@
+---
+title: "Ingresantes a nivel nacional"
+author: "Jackeline G."
+date: "2023/05/26"
+subtitle: Markdown - RMarkdown
+output:
+  html_document:
+    code_download: TRUE
+---
+
+------------------------------------------------------------------------
+Install and load the packages
+
+```{r echo = FALSE}
+# install.packages("plotly")
+# install.packages("mapsPERU")
+# install.packages("leaflet")
+# install.packages("leaflet.extras")
+# install.packages("rworldxtra")
+# install.packages("raster")
+# install.packages("mapview")
+# install.packages("sf")
+# install.packages("ggplot")
+```
+
+```{r results = FALSE}
+pacman::p_load("broom","ggpubr","tidyverse","readr")
+```
+## Utilizamos el datasets "map_DEP" incluida en el paquete "mapsPERU", que incluyen los siguientes datos:
+ 
+## COD_DEPARTAMENTO: Código del departamento
+## DEPARTAMENTO: Nombre del departamento
+## coords_x: Longitud del centroide del departamento
+## coords_y: Latitud del centroide del departamento
+## geometría: MULTIPOLYGON Objeto geométrico

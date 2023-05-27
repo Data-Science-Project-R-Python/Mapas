@@ -21,10 +21,12 @@ Install and load the packages
 # install.packages("mapview")
 # install.packages("sf")
 # install.packages("ggplot")
+# install.packages("pacman")
 ```
 
 ```{r results = FALSE}
-pacman::p_load("broom","ggpubr","tidyverse","readr")
+library(pacman)
+pacman::p_load("mapsPERU","ggplot2","leaflet","sf")
 ```
 ## Utilizamos el datasets "map_DEP" incluida en el paquete "mapsPERU", que incluyen los siguientes datos:
  
@@ -33,3 +35,55 @@ pacman::p_load("broom","ggpubr","tidyverse","readr")
 ## coords_x: Longitud del centroide del departamento
 ## coords_y: Latitud del centroide del departamento
 ## geometría: MULTIPOLYGON Objeto geométrico
+
+# Step 1: Save the map_DEP package in a database. 
+ ```{r}
+df <- map_DEP
+```
+
+# Step 2: Editing the data
+```{r}
+# Change the DEPARTMENT column to upper case and without tilde.
+df <- map_DEP
+df_1$DEPARTAMENTO <- chartr('ÁÉÍÓÚ', "AEIOU", df_1$DEPARTAMENTO)
+```
+
+# Step 3: We load the database
+```{r}
+ingresantes <- readxl::read_excel("Ingresantes2022.xlsx")
+```
+# Step 4: We join the database that has the centroids with the data column of the 2021 entrants.
+```{r}
+mapa <- df_1 %>% 
+  left_join(ingresantes)
+```
+# Step 5: We create the map base
+```{r}
+leaflet() %>% addTiles()
+```
+# Step 6: We add tags to the map
+```{r}
+leaflet() %>% addTiles() %>% 
+  addCircles(data = mapa, lat = ~coords_y, 
+             lng = ~coords_x)
+```
+# Step 7: We encapsulate the names 
+```{r}
+regiones <- mapa$DEPARTAMENTO %>% unique()
+```
+# Step 8: Defining colours for macro-regions
+```{r}
+Colores <- c('#4daf4a', "#F38458", 
+             "#E6D04F", "#E6D04F", 
+             "#EB7999", "#F38458", 
+             "#5195A9", "#E6D04F", 
+             "#EB7999", "#EB7999",
+             "#EB7999", "#EB7999", 
+             "#F38458", "#F38458",
+             "#5195A9", '#4daf4a',
+             '#4daf4a', "#E6D04F",
+             "#EB7999", "#F38458", 
+             "#E6D04F", '#4daf4a', 
+             "#E6D04F", "#F38458",
+             '#4daf4a')
+```

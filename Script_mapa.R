@@ -45,7 +45,7 @@ ingresantes <- readxl::read_excel("Ingresantes2022.xlsx")
 
 # Unimos la base de datos que tiene los centroides con la columna de datos de los ingresantes 2021 
 mapa <- df_1 %>% 
-  left_join(ingresantes) 
+  left_join(ingresantes)
 
 # Creamos la base del mapa
 leaflet() %>% addTiles()

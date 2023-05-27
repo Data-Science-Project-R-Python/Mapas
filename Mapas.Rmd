@@ -43,7 +43,7 @@ df <- map_DEP
 
 # Step 2: Editing the data
 ```{r}
-# Change the DEPARTMENT column to upper case and without tilde.
+# Change the DEPARTMENT column to upper case and without tilde
 df <- map_DEP
 df_1$DEPARTAMENTO <- chartr('ÁÉÍÓÚ', "AEIOU", df_1$DEPARTAMENTO)
 ```
@@ -86,4 +86,32 @@ Colores <- c('#4daf4a', "#F38458",
              "#E6D04F", '#4daf4a', 
              "#E6D04F", "#F38458",
              '#4daf4a')
+```
+# Step 9: The colour palette is linked to the names of the regions
+```{r}
+pal <- colorFactor(Colores, domain = regiones)
+```
+# Step 10: Labels are created with the number of entrants to universities according to departments
+```{r}
+p <- leaflet() %>% addTiles() %>% addCircleMarkers(data = mapa, lat = ~coords_y, radius = 7, # nolint # nolint: line_length_linter.
+                                        lng = ~coords_x, color = ~pal(DEPARTAMENTO), # nolint # nolint
+                                        fillOpacity = 1.8, label = ~INGRESANTES,  # nolint # nolint
+                                        group = "Codigo")
+```
+# Step 11: Generamos las leyendas y la opción de ver el código o la leyenda 
+```{r}
+p <- p %>% addLegend(data = mapa, "bottomright", pal = pal,
+                     values = ~DEPARTAMENTO, title = "Regiones",
+                     opacity = 0.8, group = "Leyenda")
+p
+
+p <- p %>% addLayersControl(overlayGroups = c("Codigo", "Leyenda"), 
+                            options = layersControlOptions(collapsed = F))
+p
+```
+```{r}
+# Another option
+p <- p %>% addLayersControl(overlayGroups = c("Codigo", "Leyenda"), 
+                            options = layersControlOptions(collapsed = F))
+p
 ```

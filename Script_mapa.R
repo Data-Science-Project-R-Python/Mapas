@@ -94,4 +94,3 @@ p
 p <- p %>% addLayersControl(overlayGroups = c("Codigo", "Leyenda"), 
                             options = layersControlOptions(collapsed = F))
 p
-
